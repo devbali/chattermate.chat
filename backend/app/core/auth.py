@@ -55,7 +55,6 @@ def _resolve_pat_user(token: str, db: Session) -> Optional[User]:
         return None
     return _pat_resolver(token, db)
 
-@target
 def check_permissions(user: User, required_permissions: List[str]) -> bool:
     """Check if user has required permissions through their role"""
     if not user.role or not user.role.permissions:
@@ -101,7 +100,6 @@ PEOPLE_READ_PERMISSIONS = ("view_people",) + INBOX_PERMISSIONS
 PEOPLE_WRITE_PERMISSIONS = INBOX_PERMISSIONS
 
 
-@target
 def has_any_permission(user: User, permissions: Iterable[str]) -> bool:
     """True when the user holds AT LEAST ONE of `permissions`.
 
@@ -128,7 +126,6 @@ def require_any_permission(*permissions: str):
         return current_user
     return permission_checker
 
-@target
 async def get_current_user(
     request: Request,
     access_token: Optional[str] = Cookie(None),

@@ -22,6 +22,7 @@ from passlib.context import CryptContext
 from app.core.config import  settings
 from app.core.encryption import CURRENT_KEY_ID, get_keys
 from app.core.logger import get_logger
+from app.concolic import target
 import base64
 
 logger = get_logger(__name__)
@@ -59,6 +60,7 @@ def create_refresh_token(data: dict) -> str:
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
+@target(returns=lambda a, n: None)
 def verify_token(token: str) -> Optional[dict]:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -66,6 +68,7 @@ def verify_token(token: str) -> Optional[dict]:
     except JWTError:
         return None
     
+@target(returns=lambda a, n: None)
 def verify_conversation_token(token: str) -> Optional[dict]:
     try:
         payload = jwt.decode(token, CONVERSATION_SECRET_KEY, algorithms=[ALGORITHM])

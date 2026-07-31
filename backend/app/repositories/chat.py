@@ -34,6 +34,7 @@ from pydantic import BaseModel
 from app.core.s3 import get_s3_signed_url
 from app.core.config import settings
 from app.services.sentiment import analyze_sentiment, compute_session_sentiment
+from app.concolic import target
 
 logger = get_logger(__name__)
 
@@ -313,6 +314,7 @@ class ChatRepository:
             ChatHistory.user_id == user_id
         ).order_by(ChatHistory.created_at.desc()).all()
 
+    @target(returns=lambda a, n: [])
     def get_recent_chats(
         self,
         skip: int = 0,
@@ -465,6 +467,7 @@ class ChatRepository:
             'session_id': r.session_id
         } for r in results]
 
+    @target(returns=lambda a, n: 0)
     async def check_session_access(
         self,
         session_id: str | UUID,
@@ -504,6 +507,7 @@ class ChatRepository:
             session.group_id and user_groups and str(session.group_id) in user_groups
         )
 
+    @target(returns=lambda a, n: None)
     async def get_chat_detail(
         self,
         session_id: str | UUID,

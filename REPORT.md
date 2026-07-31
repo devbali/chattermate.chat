@@ -363,36 +363,54 @@ These control access gating everywhere:
 
 ## 5. Decorated Functions (Targets for Concolic Testing)
 
-In the concolic runtime, functions decorated with `@interceptor.target` have:
-1. Their calls intercepted and recorded in the Run (as `call` events)
-2. Their return values automatically wrapped as symbolic variables (`SYM_RESULT_*`)
-3. All downstream comparisons on those return values tracked as path conditions
-4. Their return values included in Z3 declarations for SMT solving
+### 5.0 How to Choose What to Decorate
 
-For ChatterMate, these are the functions that should be decorated because their
-return values determine downstream behavior:
+A `@target` function marks the **boundary between application logic and an
+external system**. The concolic engine intercepts the call and replaces the
+real external operation with a symbolic return value. This means:
 
-### 5.1 Auth / Permission Functions (Highest Priority)
+- **DO NOT decorate** pure-logic functions whose implementation only loops
+  over data structures (`check_permissions`, `has_any_permission`). Their
+  internal branches are interesting — they should be *traced through*, not
+  skipped.
+- **DO NOT decorate** orchestrator functions that coordinate multiple steps
+  (e.g. `get_current_user` orchestrates cookie extraction → token verification
+  → DB query). Decorating them skips all internal branches, including the
+  token verification logic.
+- **DO decorate** functions that call out to an external system and whose
+  return value causes downstream branching — the actual `db.query().first()`
+  call, the actual JWT `decode()` call, the actual `requests.post()` call.
+- **DO decorate** repository methods that wrap SQL queries they execute,
+  *provided* they are the leaf boundary and don't call other repositories
+  internally. Check the function body — if it calls `self.db.query(...)`
+  directly, it's a valid DB boundary.
 
-These functions determine what a user can see — their return values control
-nearly every branch downstream:
+The practical test: *"If I skip this function's body and return a symbolic
+value, am I losing interesting branch exploration, or am I correctly
+treating an external interaction as atomic?"*
 
-| Function | File | Returns | Why Symbolic Return Matters |
+### 5.1 Token / Credential Verification (External Boundaries)
+
+These functions call out to JWT libraries, Fernet encryption, or Redis to
+verify tokens — they are the true auth boundary:
+
+| Function | File | Returns | Why Target (Not Pure Logic) |
 |---|---|---|---|
-| `get_current_user()` | `app/core/auth.py` | User or None | Determines identity; downstream branches on user_id, org_id, role. **Must be symbolic.** |
-| `check_permissions()` | `app/core/auth.py` | bool (True/False) | Gates every privileged route. Return value is compared in `if not check_permissions(...): raise 403` |
-| `authenticate_socket*()` | `app/core/auth_utils.py` | (widget_id, org_id, ...) tuple | Determines session context for Socket.IO events |
-| `verify_conversation_token()` | `app/core/security.py` | dict or None | Valid/invalid determines access to widget sessions |
-| `verify_token()` | `app/core/security.py` | dict or None | Valid/invalid determines JWT session identity |
+| `verify_token()` | `app/core/security.py:62` | dict or None | Calls JWT `decode()`, reads Redis. Valid/invalid determines JWT session identity. |
+| `verify_conversation_token()` | `app/core/security.py:69` | dict or None | Calls JWT `decode()` with conversation secret. Valid/invalid determines widget access. |
+| `_is_token_in_redis()` | `app/core/security.py:225` | bool | Redis `get()` call — revokes active tokens. |
+| `_store_token_in_redis()` | `app/core/security.py:186` | bool | Redis `set()` call — stores active session. |
 
-### 5.2 Data Access Functions
+### 5.2 Data Access Functions (DB Boundary)
 
-These functions touch external systems and their return values control control flow:
+Repository methods that execute SQL queries directly (not delegating to
+other repositories) are valid DB boundaries:
 
 | Function | File | Access Type | Why Symbolic |
 |---|---|---|---|
-| `get_recent_chats()` | `app/repositories/chat.py` | DB (Postgres) | Returns chat list; branch on count > 0, status, pagination |
-| `get_chat_detail()` | `app/repositories/chat.py` | DB (Postgres) | Returns chat or None; downstream branching on result |
+| `get_recent_chats()` | `app/repositories/chat.py` | DB (Postgres) | Calls `self.db.query(...)` directly. Returns chat list; branch on count, status. |
+| `get_chat_detail()` | `app/repositories/chat.py` | DB (Postgres) | Calls `self.db.query(...)` directly. Returns chat or None; downstream branches. |
+| `check_session_access()` | `app/repositories/chat.py` | DB (Postgres) | Calls `self.db.query(...).first()` directly. Returns True/False; gates access. |
 | `get_agent()` | `app/repositories/agent.py` | DB (Postgres) | Returns Agent or None; controls rate limiting, workflow flags |
 | `get_active_config()` | `app/repositories/ai_config.py` | DB (Postgres) | Returns AI config or None; controls model type, API key |
 | `verify_meta_signature()` | `app/channels/meta_base.py` | bool | Webhook auth gate; valid/invalid → 403 or process |

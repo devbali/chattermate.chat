@@ -19,7 +19,6 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
 from app.models.schemas.chat import ChatOverviewResponse, ChatDetailResponse
-from app.concolic import target
 from app.core.auth import get_current_user, require_permissions, get_unified_chat_auth
 from app.services.shopify_session import require_shopify_or_jwt_auth
 from app.models.user import User
@@ -38,14 +37,12 @@ logger = get_logger(__name__)
 
 
 @router.get("/")
-@target
 async def get_chat_history():
     return {"message": "Chat history endpoint"}
 
 
 @router.get("/recent/shopify", response_model=List[ChatOverviewResponse])
 @router.get("/recent", response_model=List[ChatOverviewResponse])
-@target
 async def get_recent_chats(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
