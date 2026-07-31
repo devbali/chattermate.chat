@@ -25,6 +25,7 @@ from typing import ClassVar, List, Optional
 import httpx
 
 from app.channels.base import ChannelAdapter, InboundMessage, SendResult
+from app.concolic import target
 from app.channels.registry import register_adapter
 from app.core.config import settings
 from app.core.security import decrypt_api_key
@@ -232,6 +233,7 @@ class SlackAdapter(ChannelAdapter):
     async def verify_webhook(self, headers: dict, raw_body: bytes, account: Optional[ChannelAccount]) -> bool:
         return verify_slack_signature(headers, raw_body)
 
+    @target
     def parse_inbound(self, payload: dict) -> List[InboundMessage]:
         """Normalize an Events API callback. Handles app_mention and direct
         messages; bot echoes, edits, and other subtypes yield nothing."""
@@ -311,6 +313,7 @@ class SlackAdapter(ChannelAdapter):
         except Exception as e:
             logger.debug(f"Slack typing placeholder failed (non-critical): {e}")
 
+    @target
     async def send_text(self, account: ChannelAccount, conversation: ChannelConversation, text: str) -> SendResult:
         channel, thread_ts = self._split_conversation(conversation.external_conversation_id)
         token = self._access_token(account)

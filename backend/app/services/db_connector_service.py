@@ -29,6 +29,7 @@ from uuid import UUID
 
 from app.core.logger import get_logger
 from app.core.security import decrypt_api_key
+from app.concolic import target
 
 logger = get_logger(__name__)
 
@@ -223,6 +224,7 @@ def _connection(config: DBConnectorConfig):
                 pass
 
 
+@target
 def run_readonly_query(
     config: DBConnectorConfig, sql: str
 ) -> Tuple[List[str], List[tuple]]:

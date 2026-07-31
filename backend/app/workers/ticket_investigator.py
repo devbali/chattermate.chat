@@ -25,6 +25,7 @@ from typing import Optional
 from uuid import UUID
 
 from app.core.config import settings
+from app.concolic import target
 from app.core.logger import get_logger
 from app.core.security import decrypt_api_key
 from app.database import SessionLocal
@@ -363,6 +364,7 @@ def _build_db_tools(db, ticket: Ticket, run):
         return None
 
 
+@target
 async def _investigate_with_tools(
     db, run, service, ticket, agent, context_message, settings_row, recorder
 ):
@@ -546,6 +548,7 @@ def _fail_run(db, run: InvestigationRun, ticket: Ticket, previous_status: str, e
     db.commit()
 
 
+@target
 async def run_ticket_investigator() -> None:
     """Single pass: process every pending run (bounded concurrency)."""
     with SessionLocal() as db:

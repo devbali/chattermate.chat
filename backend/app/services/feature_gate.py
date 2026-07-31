@@ -28,6 +28,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.logger import get_logger
+from app.concolic import target
 
 try:
     from app.enterprise.repositories.plan import PlanRepository
@@ -39,6 +40,7 @@ except ImportError:
 logger = get_logger(__name__)
 
 
+@target
 def feature_allowed(db: Session, organization_id: UUID, feature: str) -> bool:
     """Non-raising check. Any gating-lookup failure fails CLOSED (feature
     hidden) rather than surfacing a 500 — used by public/unauthenticated

@@ -22,6 +22,7 @@ from typing import ClassVar, List, Optional
 import httpx
 
 from app.channels.base import ChannelAdapter, InboundMessage, SendResult, ChannelInteraction
+from app.concolic import target
 from app.channels.registry import register_adapter
 from app.models.channels import ChannelAccount, ChannelConversation, ChannelType
 from app.core.security import decrypt_api_key
@@ -103,6 +104,7 @@ class TelegramAdapter(ChannelAdapter):
         provided = headers.get("x-telegram-bot-api-secret-token", "")
         return hmac.compare_digest(provided, account.webhook_secret or "")
 
+    @target
     def parse_inbound(self, payload: dict) -> List[InboundMessage]:
         """Normalize a Telegram Update. Only plain user text messages become
         InboundMessages; bot echoes, shared contacts (handled as interactions)
@@ -154,6 +156,7 @@ class TelegramAdapter(ChannelAdapter):
             )
         return None
 
+    @target
     async def send_text(self, account: ChannelAccount, conversation: ChannelConversation, text: str) -> SendResult:
         return await self._send_message(account, conversation.external_conversation_id, text)
 

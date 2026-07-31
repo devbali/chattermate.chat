@@ -17,6 +17,7 @@ limitations under the License.
 import requests
 from typing import Dict, Any, List, Optional
 from app.core.logger import get_logger
+from app.concolic import target
 from app.models.shopify import ShopifyShop
 from sqlalchemy.orm import Session
 from app.repositories.shopify_shop_repository import ShopifyShopRepository
@@ -167,6 +168,7 @@ class ShopifyService:
                 "message": f"Error executing GraphQL query: {str(e)}"
             }
 
+    @target
     def get_products(self, shop: ShopifyShop, limit: int = 10) -> Dict[str, Any]:
         """
         Get products from a Shopify store using GraphQL.
@@ -278,6 +280,7 @@ class ShopifyService:
             "end_cursor": result.get("data", {}).get("products", {}).get("pageInfo", {}).get("endCursor")
         }
     
+    @target
     def get_product(self, shop: ShopifyShop, product_id: str) -> Dict[str, Any]:
         """
         Get a specific product from a Shopify store using GraphQL.

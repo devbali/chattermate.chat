@@ -17,6 +17,7 @@ limitations under the License.
 from typing import ClassVar, List
 
 from app.channels.messenger import MessengerAdapter
+from app.concolic import target
 from app.channels.meta_base import GRAPH_INSTAGRAM_BASE
 from app.channels.registry import register_adapter
 from app.models.channels import ChannelType

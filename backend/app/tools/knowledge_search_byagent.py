@@ -18,6 +18,7 @@ from typing import List, Dict, Any
 from agno.tools import Toolkit
 from agno.utils.log import logger
 from app.database import SessionLocal
+from app.concolic import target
 from app.core.config import settings
 from app.repositories.knowledge_to_agent import KnowledgeToAgentRepository
 from app.repositories.knowledge import KnowledgeRepository
@@ -47,6 +48,7 @@ class KnowledgeSearchByAgent(Toolkit):
         self.agent_knowledge = None
         self.register(self.search_knowledge_base)
 
+    @target
     def search_knowledge_base(self, query: str) -> str:
         """Use this function to search the knowledge base for information about a query.
 

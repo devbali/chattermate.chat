@@ -17,6 +17,7 @@ limitations under the License.
 from typing import Optional, Dict, Any, List
 from agno.tools import Toolkit
 from app.core.logger import get_logger
+from app.concolic import target
 from app.services.shopify import ShopifyService
 from app.repositories.session_to_agent import SessionToAgentRepository
 from app.database import SessionLocal
@@ -201,6 +202,7 @@ class ShopifyTools(Toolkit):
                 "message": f"Error listing products: {str(e)}"
             })
     
+    @target
     def get_product(self, product_id: str) -> str:
         """
         Get a specific product from the Shopify store.
@@ -263,6 +265,7 @@ class ShopifyTools(Toolkit):
                 "message": f"Error getting product: {str(e)}"
             })
     
+    @target
     def search_products(self, query: str, limit: int = 8, cursor: Optional[str] = None, min_price: Optional[float] = None, max_price: Optional[float] = None, vendor: Optional[str] = None) -> str:
         """
         Search for products in the Shopify store using a query string with GraphQL.

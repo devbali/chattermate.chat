@@ -36,6 +36,7 @@ from typing import Iterable, List, Optional, Sequence
 
 import sqlglot
 from sqlglot import exp
+from app.concolic import target
 
 MASK_VALUE = "***MASKED***"
 
@@ -216,6 +217,7 @@ def _force_limit(statement: exp.Select, max_rows: int) -> exp.Select:
     return statement.limit(max_rows, copy=False)
 
 
+@target
 def validate_sql(
     raw_sql: str,
     allowed_tables: Sequence[str],

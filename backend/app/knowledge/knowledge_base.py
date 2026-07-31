@@ -18,6 +18,7 @@ from agno.knowledge.pdf import PDFKnowledgeBase, PDFImageReader, PDFReader
 from agno.knowledge.pdf_url import PDFUrlKnowledgeBase
 from agno.vectordb.pgvector import PgVector, SearchType
 from app.knowledge.optimized_pgvector import OptimizedPgVector
+from app.concolic import target
 from app.core.config import settings
 from app.core.logger import get_logger
 from app.knowledge.enhanced_website_kb import EnhancedWebsiteKnowledgeBase
@@ -350,6 +351,7 @@ class KnowledgeManager:
             logger.error(f"Error adding PDF files: {str(e)}")
             return False
 
+    @target
     def get_knowledge_base(self) -> List[Dict]:
         """Get all knowledge sources for the organization or specific agent"""
         try:

@@ -25,6 +25,7 @@ import re
 from datetime import datetime, timedelta
 
 from app.models.workflow import Workflow, WorkflowStatus
+from app.concolic import target
 from app.models.workflow_node import WorkflowNode, NodeType, ExitCondition
 from app.models.workflow_connection import WorkflowConnection
 from app.models.session_to_agent import SessionToAgent
@@ -65,6 +66,7 @@ class WorkflowExecutionService:
         self.workflow_repo = WorkflowRepository(db)
         self.session_repo = SessionToAgentRepository(db)
     
+    @target
     async def execute_workflow(
         self,
         session_id: str,

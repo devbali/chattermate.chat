@@ -39,6 +39,7 @@ from app.models.ticket_db_connector import DBConnectorAuditLog, DBConnectorAudit
 from app.services import db_connector_service
 from app.services.db_connector_service import DBConnectorConfig
 from app.services.sql_guardrails import mask_rows, normalize_scope_map, validate_sql
+from app.concolic import target
 
 logger = get_logger(__name__)
 
@@ -221,6 +222,7 @@ class GuardrailedDBTools(Toolkit):
         )
         return f"Columns of {match}:\n" + "\n".join(lines) + note
 
+    @target
     async def query_database(self, connector: str, sql: str) -> str:
         """Run a read-only SQL SELECT against an allowlisted database.
 

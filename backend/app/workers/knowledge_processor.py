@@ -16,15 +16,23 @@ limitations under the License.
 
 import asyncio
 from app.database import SessionLocal
+from app.concolic import target
 from app.repositories.knowledge_queue import KnowledgeQueueRepository
+from app.concolic import target
 from app.knowledge.knowledge_base import KnowledgeManager
+from app.concolic import target
 from app.models.knowledge_queue import QueueStatus, ProcessingStage
+from app.concolic import target
 from app.core.logger import get_logger
+from app.concolic import target
 import os
 from app.core.processor import PROCESSOR_STATUS
+from app.concolic import target
 from datetime import datetime
 from app.models.notification import Notification, NotificationType
+from app.concolic import target
 from app.services.user import send_fcm_notification
+from app.concolic import target
 from urllib.parse import urlparse, unquote
 
 logger = get_logger(__name__)

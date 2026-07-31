@@ -18,6 +18,7 @@ import asyncio
 import redis
 import functools
 from app.core.config import settings
+from app.concolic import target
 from app.core.logger import get_logger
 from app.core.socketio import sio
 
@@ -49,6 +50,7 @@ if settings.REDIS_ENABLED:
         redis_client = None
 
 
+@target
 def socket_rate_limit(namespace='/widget'):
     """
     Socket rate limiting decorator for socketio event handlers

@@ -20,6 +20,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from app.core.socketio import sio
+from app.concolic import target
 from app.channels import get_adapter, WindowStatus
 from app.models.session_to_agent import SessionToAgent
 from app.repositories.channels import ChannelAccountRepository, ChannelConversationRepository
@@ -38,6 +39,7 @@ class DeliveryResult:
     can_template: bool = False
 
 
+@target
 async def deliver_to_customer(db: Session, session_record: SessionToAgent, payload: dict) -> DeliveryResult:
     """Route a reply (human or bot) to wherever the customer is.
 

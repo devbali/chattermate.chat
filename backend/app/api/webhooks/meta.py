@@ -18,6 +18,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, R
 from sqlalchemy.orm import Session
 
 from app.api.webhooks.common import is_duplicate_message
+from app.concolic import target
 from app.channels import get_adapter
 from app.channels.meta_base import verify_meta_signature, verify_challenge
 from app.core.logger import get_logger
@@ -53,6 +54,7 @@ async def meta_webhook_verify(
 
 
 @router.post("")
+@target
 async def meta_webhook(
     request: Request,
     background_tasks: BackgroundTasks,

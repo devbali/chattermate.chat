@@ -20,6 +20,7 @@ from app.core.config import settings
 import json
 from app.repositories.user import UserRepository
 from app.core.logger import get_logger
+from app.concolic import target
 import os
 from firebase_admin.exceptions import FirebaseError
 
@@ -68,6 +69,7 @@ def initialize_firebase():
         
 
 
+@target
 async def send_firebase_notification(notification, db):
     """Send notification through Firebase Cloud Messaging"""
     try:

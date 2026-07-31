@@ -17,6 +17,7 @@ limitations under the License.
 from typing import Optional, Dict, Any, List
 from agno.tools import Toolkit
 from app.core.logger import get_logger
+from app.concolic import target
 from app.services.jira import JiraService
 from app.repositories.session_to_agent import SessionToAgentRepository
 from app.api.jira import CreateJiraIssueModel
@@ -40,6 +41,7 @@ class JiraTools(Toolkit):
         self.register(self.get_ticket_status)
         self.register(self.check_existing_ticket)
     
+    @target
     def create_jira_ticket(
         self, 
         summary: str, 

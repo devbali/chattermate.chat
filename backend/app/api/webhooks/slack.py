@@ -18,6 +18,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.api.webhooks.common import is_duplicate_message
+from app.concolic import target
 from app.channels import get_adapter
 from app.channels.slack import verify_slack_signature
 from app.core.logger import get_logger

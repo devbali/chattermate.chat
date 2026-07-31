@@ -22,6 +22,7 @@ from app.channels.meta_base import MetaBaseAdapter, graph_post
 from app.channels.registry import register_adapter
 from app.models.channels import ChannelAccount, ChannelConversation, ChannelType
 from app.core.logger import get_logger
+from app.concolic import target
 
 logger = get_logger(__name__)
 
@@ -34,6 +35,7 @@ class WhatsAppAdapter(MetaBaseAdapter):
     # Outside the 24h window WhatsApp allows re-opening with an approved template
     expired_status: ClassVar[WindowStatus] = WindowStatus.TEMPLATE_REQUIRED
 
+    @target
     def parse_inbound(self, payload: dict) -> List[InboundMessage]:
         """Normalize a WhatsApp Cloud API webhook.
 
@@ -115,6 +117,7 @@ class WhatsAppAdapter(MetaBaseAdapter):
         except Exception as e:
             logger.debug(f"WhatsApp typing indicator failed (non-critical): {e}")
 
+    @target
     async def send_text(self, account: ChannelAccount, conversation: ChannelConversation, text: str) -> SendResult:
         return await graph_post(
             f"{account.external_account_id}/messages",

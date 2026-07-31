@@ -17,6 +17,7 @@ limitations under the License.
 from typing import ClassVar, List, Optional
 
 from app.channels.base import InboundMessage, SendResult
+from app.concolic import target
 from app.channels.meta_base import GRAPH_BASE, MetaBaseAdapter, graph_get, graph_post
 from app.channels.registry import register_adapter
 from app.models.channels import ChannelAccount, ChannelConversation, ChannelType
@@ -65,6 +66,7 @@ class MessengerAdapter(MetaBaseAdapter):
         changes[] instead."""
         return entry.get("messaging") or []
 
+    @target
     def parse_inbound(self, payload: dict) -> List[InboundMessage]:
         """Normalize per-entry messaging events. Echoes, delivery/read receipts
         and attachment-only messages yield nothing."""
@@ -92,6 +94,7 @@ class MessengerAdapter(MetaBaseAdapter):
                 ))
         return messages
 
+    @target
     async def send_text(self, account: ChannelAccount, conversation: ChannelConversation, text: str) -> SendResult:
         # `me/messages` resolves to the page/account owning the access token
         return await graph_post(

@@ -21,6 +21,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from app.agents.chat_agent import ChatAgent
+from app.concolic import target
 from app.channels import InboundMessage, ChannelInteraction, get_adapter
 from app.core.socketio import sio
 from app.core.security import decrypt_api_key
@@ -53,6 +54,7 @@ except ImportError:
 logger = get_logger(__name__)
 
 
+@target
 async def process_channel_message(account_id, inbound: InboundMessage) -> None:
     """Process one inbound customer message from an external channel.
 

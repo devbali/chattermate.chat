@@ -22,6 +22,7 @@ import re
 from types import SimpleNamespace
 from fastapi import APIRouter
 from app.core.socketio import sio
+from app.concolic import target
 from app.core.logger import get_logger
 import traceback
 from app.agents.chat_agent import ChatAgent, ChatResponse
@@ -157,6 +158,7 @@ def validate_form_data(form_fields: list, form_data: dict) -> list:
     return errors
 
 @sio.on('connect', namespace='/widget')
+@target
 async def widget_connect(sid, environ, auth):
     db = None
     try:
@@ -310,6 +312,7 @@ async def widget_connect(sid, environ, auth):
 
 @sio.on('chat', namespace='/widget')
 @socket_rate_limit(namespace='/widget')
+@target
 async def handle_widget_chat(sid, data):
     """Handle widget chat messages"""
     db = None

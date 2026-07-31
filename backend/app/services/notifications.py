@@ -20,6 +20,7 @@ from typing import Iterable, Optional
 from sqlalchemy.orm import Session
 
 from app.core.logger import get_logger
+from app.concolic import target
 from app.models.notification import Notification, NotificationType
 from app.models.notification_settings import (
     NOTIFY_CHAT_ASSIGNED,
@@ -41,6 +42,7 @@ class ChatNotificationEvent(str, enum.Enum):
     CHAT_ASSIGNED = NOTIFY_CHAT_ASSIGNED
 
 
+@target
 async def notify_user(
     db: Session,
     user_id,

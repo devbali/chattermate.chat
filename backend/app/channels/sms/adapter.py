@@ -17,6 +17,7 @@ limitations under the License.
 from typing import ClassVar, List, Optional
 
 from app.channels.base import ChannelAdapter, InboundMessage, SendResult
+from app.concolic import target
 from app.channels.registry import register_adapter
 from app.channels.sms.base import MAX_MESSAGE_LENGTH, get_provider
 from app.models.channels import ChannelAccount, ChannelConversation, ChannelType
@@ -46,6 +47,7 @@ class SmsAdapter(ChannelAdapter):
         # Inbound is parsed per-provider in the webhook route, not here.
         return []
 
+    @target
     async def send_text(self, account: ChannelAccount, conversation: ChannelConversation, text: str) -> SendResult:
         provider = get_provider(account_provider_name(account))
         if provider is None:

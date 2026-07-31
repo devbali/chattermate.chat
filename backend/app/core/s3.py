@@ -25,6 +25,7 @@ from app.core.logger import get_logger
 from fastapi import HTTPException
 from typing import Optional
 from urllib.parse import urlparse, urlunparse
+from app.concolic import target
 
 logger = get_logger(__name__)
 
@@ -156,6 +157,7 @@ async def get_s3_signed_url(s3_url: str, expiration: Optional[int] = None) -> st
     """
     return sign_s3_url(s3_url, expiration)
 
+@target
 async def upload_file_to_s3(
     file_content: bytes,
     folder: str,
@@ -245,6 +247,7 @@ async def download_file_from_s3(s3_url: str) -> bytes:
     return await asyncio.to_thread(_download)
 
 
+@target
 async def delete_file_from_s3(s3_url: str) -> bool:
     """Delete file from S3 bucket"""
     try:

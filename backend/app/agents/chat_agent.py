@@ -38,6 +38,7 @@ from app.services.notifications import ChatNotificationEvent, notify_chat_event
 from app.models.user import User, user_groups
 from datetime import datetime
 from app.repositories.jira import JiraRepository
+from app.concolic import target
 from app.tools.jira_toolkit import JiraTools
 from app.tools.shopify_toolkit import ShopifyTools
 from app.utils.response_parser import parse_response_content
@@ -1110,6 +1111,7 @@ Keep your responses concise and focused. Provide clear, actionable information i
             transfer_group_id=transfer_group_id
         )
 
+    @target
     async def get_response(self, message: str, session_id: str = None, org_id: str = None, agent_id: str = None, customer_id: str = None) -> ChatResponse:
         """
         Get a response from the agent.
@@ -1308,6 +1310,7 @@ Keep your responses concise and focused. Provide clear, actionable information i
             
             return error_response
 
+    @target
     @staticmethod
     async def test_api_key(api_key: str, model_type: str, model_name: str) -> bool:
         """Test if the API key is valid for the given model type.

@@ -24,6 +24,7 @@ from typing import ClassVar, List, Optional
 import httpx
 
 from app.channels.base import ChannelAdapter, InboundMessage, SendResult
+from app.concolic import target
 from app.channels.registry import register_adapter
 from app.core.security import decrypt_api_key
 from app.models.channels import ChannelAccount, ChannelConversation, ChannelType
@@ -103,6 +104,7 @@ class LineAdapter(ChannelAdapter):
         ).decode()
         return hmac.compare_digest(expected, signature)
 
+    @target
     def parse_inbound(self, payload: dict) -> List[InboundMessage]:
         """Normalize webhook events; only one-on-one text messages become
         InboundMessages."""
@@ -128,6 +130,7 @@ class LineAdapter(ChannelAdapter):
             ))
         return messages
 
+    @target
     async def send_text(self, account: ChannelAccount, conversation: ChannelConversation, text: str) -> SendResult:
         try:
             response = await _get_http_client().post(

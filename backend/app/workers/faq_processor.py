@@ -21,15 +21,25 @@ works as a standalone service if it ever needs its own container.
 import asyncio
 
 from app.database import SessionLocal
+from app.concolic import target
 from app.core.config import settings
+from app.concolic import target
 from app.core.logger import get_logger
+from app.concolic import target
 from app.models.faq_generation_job import FAQJobType
+from app.concolic import target
 from app.models.notification import NotificationType
+from app.concolic import target
 from app.repositories.faq_generation_job import FAQGenerationJobRepository
+from app.concolic import target
 from app.services.faq_article_import import run_article_import_job
+from app.concolic import target
 from app.services.faq_generation import run_generation_job
+from app.concolic import target
 from app.services.faq_import import run_import_job, run_pdf_import_job
+from app.concolic import target
 from app.services.notifications import notify_user
+from app.concolic import target
 
 logger = get_logger(__name__)
 

@@ -22,6 +22,7 @@ import time
 from threading import Lock
 
 from app.core.logger import get_logger
+from app.concolic import target
 
 logger = get_logger(__name__)
 
@@ -41,6 +42,7 @@ def _redis_client():
         return None
 
 
+@target
 def allow_request(key: str, limit: int, window_seconds: int) -> bool:
     """True if `key` may make another request in the current fixed window."""
     client = _redis_client()
